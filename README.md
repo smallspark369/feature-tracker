@@ -24,7 +24,7 @@ One Python process runs everything: the web app, its API, and the bot.
 **See [DEPLOY.md](DEPLOY.md)** — written so a non-developer mod can do it in
 a browser in ~10 minutes. The short version: create a bot with @BotFather,
 deploy this repo to Render/Railway with `BOT_TOKEN` as the only variable,
-add the bot to the group, type `/app`, pin the message.
+add the bot to the group, type `/feedback`, pin the message.
 
 Everything else is automatic:
 
@@ -32,7 +32,7 @@ Everything else is automatic:
   `PUBLIC_URL` manually.
 - **Transport** — webhook when a public URL is known, long polling otherwise.
 - **Announcement group** — captured when the bot is added to a group
-  (re-captured wherever `/app` is run, so moving groups is trivial).
+  (re-captured wherever `/feedback` is run, so moving groups is trivial).
 - **Admins** — the group's own admin list, fetched live and cached 5 min.
   `ADMIN_IDS` adds extras.
 

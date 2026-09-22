@@ -1,26 +1,26 @@
-/* Theme plugs into Telegram's runtime palette so the app matches the user's
-   Telegram light/dark theme; fallbacks let it run in a plain browser. */
+/* Fixed dark theme matched to the community app's UI:
+   warm near-black, charcoal panels, mint accent, outlined pill selection. */
 :root {
-  --bg: var(--tg-theme-secondary-bg-color, #eef1f4);
-  --card: var(--tg-theme-bg-color, #ffffff);
-  --text: var(--tg-theme-text-color, #12181f);
-  --hint: var(--tg-theme-hint-color, #70808f);
-  --accent: var(--tg-theme-button-color, #2e7bd6);
-  --accent-text: var(--tg-theme-button-text-color, #ffffff);
-  --line: color-mix(in srgb, var(--hint) 22%, transparent);
+  --bg: #0c0d0a;
+  --panel: #171814;
+  --elev: #212320;
+  --line: #2a2c27;
+  --text: #eceee9;
+  --hint: #8e948b;
+  --mint: #8de3be;
+  --mint-soft: rgba(141, 227, 190, .14);
 
-  /* Fixed semantic colors (kept status-legible in both themes) */
-  --c-planned: #4c9ce2;
-  --c-progress: #e0a03c;
-  --c-done: #3fae5a;
-  --c-declined: #96a0aa;
-  --c-bug: #d6564c;
+  --c-planned: #85b7e4;
+  --c-progress: #e2b471;
+  --c-done: #8de3be;
+  --c-declined: #70756e;
+  --c-bug: #e08078;
 
   font-size: 16px;
+  color-scheme: dark;
 }
 
 * { box-sizing: border-box; }
-
 [hidden] { display: none !important; }
 
 html, body { margin: 0; padding: 0; }
@@ -28,82 +28,91 @@ html, body { margin: 0; padding: 0; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  font-family: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Fallback controls only appear outside Telegram (native Back/Main buttons
-   take over inside). */
 body.in-tg .hide-in-tg { display: none; }
 
-.view { max-width: 640px; margin: 0 auto; padding: 0 12px; }
+.view { max-width: 640px; margin: 0 auto; padding: 0 14px; }
 
-/* ---- top bar / tabs ---- */
+/* ---- top bar: underlined text tabs, like the app's Configuration | Schedule ---- */
 .topbar {
   position: sticky; top: 0; z-index: 5;
-  padding: 10px 0 8px;
+  display: flex; gap: 10px; align-items: center;
+  padding: 12px 0 0;
   background: var(--bg);
+  border-bottom: 1px solid var(--line);
 }
-.tabs {
-  display: flex; gap: 2px;
-  background: color-mix(in srgb, var(--hint) 14%, transparent);
-  border-radius: 10px; padding: 3px;
-}
+.tabs { flex: 1; display: flex; gap: 22px; }
 .tab {
-  flex: 1; border: 0; background: transparent; color: var(--hint);
-  font: inherit; font-size: .9rem; font-weight: 500;
-  padding: 7px 0; border-radius: 8px; cursor: pointer;
+  border: 0; background: none; cursor: pointer;
+  color: var(--hint); font: inherit; font-size: .95rem; font-weight: 600;
+  padding: 6px 2px 12px;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
 }
-.tab.active { background: var(--card); color: var(--text); font-weight: 600; }
+.tab.active { color: var(--mint); border-bottom-color: var(--mint); }
 
 .subhead {
   display: flex; align-items: center; gap: 10px;
-  padding: 14px 0 6px;
+  padding: 16px 0 8px;
 }
-.subhead h2 { margin: 0; font-size: 1.05rem; font-weight: 650; }
+.subhead h2 { margin: 0; font-size: 1.05rem; font-weight: 700; }
 
 /* ---- list ---- */
 .section-label {
-  margin: 18px 2px 8px;
+  display: flex; align-items: center; gap: 7px;
+  margin: 20px 2px 8px;
   font-size: .8rem; font-weight: 600; color: var(--hint);
 }
-.section-label:first-child { margin-top: 6px; }
+.section-label::before {
+  content: ""; width: 7px; height: 7px; border-radius: 50%;
+  background: var(--hint);
+}
+.section-label.sl-in_progress::before { background: var(--c-progress); }
+.section-label.sl-planned::before { background: var(--c-planned); }
+.section-label:first-child { margin-top: 14px; }
 
 .card {
   display: flex; align-items: stretch; gap: 12px;
-  background: var(--card);
-  border-radius: 12px;
-  border-left: 3px solid transparent;
-  padding: 12px 14px 12px 11px;
-  margin-bottom: 8px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  border-radius: 14px;
+  padding: 13px 15px 13px 12px;
+  margin-bottom: 9px;
   cursor: pointer;
 }
-.card.st-planned   { border-left-color: var(--c-planned); }
+.card.st-planned     { border-left-color: var(--c-planned); }
 .card.st-in_progress { border-left-color: var(--c-progress); }
-.card.st-completed { border-left-color: var(--c-done); }
-.card.st-declined  { border-left-color: var(--c-declined); opacity: .75; }
+.card.st-completed   { border-left-color: var(--c-done); }
+.card.st-declined    { border-left-color: var(--c-declined); opacity: .7; }
 
-/* The vote pill — the one loud element on the page. */
+/* Vote pill — selection language borrowed from the app's day chips:
+   quiet by default, mint outline + mint text when active. */
 .vote {
   align-self: center;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
-  min-width: 46px; min-height: 52px;
-  border: 1px solid var(--line); border-radius: 10px;
-  background: transparent; color: var(--hint);
-  font: inherit; font-size: .85rem; font-weight: 650;
+  min-width: 48px; min-height: 54px;
+  border: 1px solid var(--line); border-radius: 12px;
+  background: var(--elev); color: var(--hint);
+  font: inherit; font-size: .85rem; font-weight: 700;
   cursor: pointer; flex-shrink: 0;
   transition: transform .08s ease;
 }
 .vote:active { transform: scale(.94); }
-.vote .tri { font-size: .7rem; line-height: 1; margin-bottom: 3px; }
+.vote .tri { font-size: .68rem; line-height: 1; margin-bottom: 3px; }
 .vote.voted {
-  background: var(--accent); border-color: var(--accent); color: var(--accent-text);
+  background: var(--mint-soft);
+  border-color: var(--mint);
+  color: var(--mint);
 }
 
 .card .body { min-width: 0; flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
 .card h3 {
-  margin: 0; font-size: .98rem; font-weight: 600; line-height: 1.3;
+  margin: 0; font-size: .98rem; font-weight: 600; line-height: 1.35;
   overflow-wrap: anywhere;
 }
 .meta {
@@ -114,13 +123,14 @@ body.in-tg .hide-in-tg { display: none; }
 .tag-bug {
   color: var(--c-bug);
   border: 1px solid color-mix(in srgb, var(--c-bug) 45%, transparent);
-  border-radius: 5px; padding: 0 5px; font-weight: 600; font-size: .72rem;
+  border-radius: 999px; padding: 0 7px; font-weight: 600; font-size: .72rem;
 }
 .prio { font-weight: 600; }
 .prio-unsorted { color: var(--c-progress); }
 .prio-critical { color: var(--c-bug); }
 
 .status-word { font-weight: 600; }
+.status-word.st-open { color: var(--text); }
 .status-word.st-planned { color: var(--c-planned); }
 .status-word.st-in_progress { color: var(--c-progress); }
 .status-word.st-completed { color: var(--c-done); }
@@ -128,31 +138,33 @@ body.in-tg .hide-in-tg { display: none; }
 
 .empty {
   text-align: center; color: var(--hint);
-  padding: 64px 24px; font-size: .95rem; line-height: 1.5;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+  padding: 56px 24px; margin-top: 16px;
+  font-size: .95rem; line-height: 1.55;
 }
 .empty b { color: var(--text); }
 
 /* ---- forms ---- */
-.form { display: flex; flex-direction: column; gap: 16px; padding-top: 6px; }
+.form { display: flex; flex-direction: column; gap: 18px; padding-top: 6px; }
 .kind-toggle { display: flex; gap: 8px; }
 .kind {
-  flex: 1; padding: 10px 0; border-radius: 10px;
-  border: 1px solid var(--line); background: var(--card); color: var(--hint);
+  flex: 1; padding: 11px 0; border-radius: 12px;
+  border: 1px solid var(--line); background: var(--elev); color: var(--hint);
   font: inherit; font-weight: 600; cursor: pointer;
 }
-.kind.active { border-color: var(--accent); color: var(--accent); }
-.kind[data-kind="bug"].active { border-color: var(--c-bug); color: var(--c-bug); }
+.kind.active { background: var(--mint-soft); border-color: var(--mint); color: var(--mint); }
 
-.field { display: flex; flex-direction: column; gap: 6px; }
-.field > span { font-size: .85rem; font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 7px; }
+.field > span { font-size: .85rem; font-weight: 600; color: var(--hint); }
 input[type="text"], textarea {
   font: inherit; color: var(--text);
-  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
-  padding: 11px 12px; width: 100%;
+  background: var(--elev); border: 1px solid var(--line); border-radius: 12px;
+  padding: 12px 13px; width: 100%;
 }
-textarea { resize: vertical; min-height: 96px; }
+input::placeholder, textarea::placeholder { color: color-mix(in srgb, var(--hint) 70%, transparent); }
+textarea { resize: vertical; min-height: 100px; }
 input:focus-visible, textarea:focus-visible, button:focus-visible {
-  outline: 2px solid var(--accent); outline-offset: 1px;
+  outline: 2px solid var(--mint); outline-offset: 1px;
 }
 
 .previews { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -160,87 +172,89 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
 .thumb { position: relative; }
 .thumb img {
   width: 72px; height: 72px; object-fit: cover;
-  border-radius: 8px; border: 1px solid var(--line); display: block;
+  border-radius: 10px; border: 1px solid var(--line); display: block;
 }
 .thumb button {
   position: absolute; top: -6px; right: -6px;
   width: 22px; height: 22px; border-radius: 50%;
-  border: 0; background: var(--text); color: var(--card);
+  border: 1px solid var(--line); background: var(--elev); color: var(--text);
   font-size: .8rem; line-height: 1; cursor: pointer;
 }
 
 .file-btn {
   align-self: flex-start;
-  border: 1px dashed color-mix(in srgb, var(--hint) 50%, transparent);
-  border-radius: 10px; padding: 9px 16px;
-  color: var(--accent); font-size: .9rem; font-weight: 600; cursor: pointer;
+  border: 1px dashed color-mix(in srgb, var(--mint) 55%, transparent);
+  border-radius: 12px; padding: 10px 18px;
+  color: var(--mint); font-size: .9rem; font-weight: 600; cursor: pointer;
+  background: transparent;
 }
 .hint { margin: 0; font-size: .78rem; color: var(--hint); }
 
 .primary-btn {
-  padding: 13px; border: 0; border-radius: 12px;
-  background: var(--accent); color: var(--accent-text);
-  font: inherit; font-size: 1rem; font-weight: 650; cursor: pointer;
+  padding: 14px; border: 0; border-radius: 12px;
+  background: var(--mint); color: var(--bg);
+  font: inherit; font-size: 1rem; font-weight: 700; cursor: pointer;
 }
 .primary-btn:disabled { opacity: .6; }
 .ghost-btn, .back-btn {
-  border: 0; background: transparent; color: var(--accent);
-  font: inherit; font-weight: 600; cursor: pointer; padding: 6px 4px;
+  border: 0; background: transparent; color: var(--mint);
+  font: inherit; font-weight: 600; cursor: pointer; padding: 6px 4px 12px;
 }
-.topbar { display: flex; gap: 8px; align-items: center; }
-.topbar .tabs { flex: 1; }
+.back-btn { padding: 6px 4px; }
 
 /* ---- detail ---- */
 .detail {
-  background: var(--card); border-radius: 14px;
-  padding: 16px; margin-top: 4px;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 16px;
+  padding: 18px; margin-top: 4px;
 }
-.detail h1 { margin: 0 0 8px; font-size: 1.15rem; line-height: 1.35; overflow-wrap: anywhere; }
+.detail h1 { margin: 0 0 8px; font-size: 1.15rem; font-weight: 700; line-height: 1.35; overflow-wrap: anywhere; }
 .detail .meta { margin-bottom: 14px; }
 .detail .desc {
   white-space: pre-wrap; overflow-wrap: anywhere;
-  font-size: .95rem; line-height: 1.55; margin: 0 0 16px;
+  font-size: .95rem; line-height: 1.6; margin: 0 0 16px; color: var(--text);
 }
 .detail .desc:empty { display: none; }
 .shots { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; margin-bottom: 16px; }
 .shots img {
   width: 100%; aspect-ratio: 1; object-fit: cover;
-  border-radius: 10px; border: 1px solid var(--line); cursor: zoom-in; display: block;
+  border-radius: 12px; border: 1px solid var(--line); cursor: zoom-in; display: block;
 }
-.detail-vote {
-  display: flex; align-items: center; gap: 10px;
-  padding-top: 4px;
-}
+.detail-vote { display: flex; align-items: center; gap: 10px; padding-top: 4px; }
 .detail-vote .vote { flex-direction: row; gap: 6px; min-height: 44px; padding: 0 16px; }
 .detail-vote .vote .tri { margin: 0; }
 
-.triage { border-top: 1px solid var(--line); margin-top: 16px; padding-top: 14px; }
-.triage h4 { margin: 10px 0 8px; font-size: .82rem; color: var(--hint); font-weight: 600; }
+/* Triage chips — pill selection like the app's preset chips. */
+.triage { border-top: 1px solid var(--line); margin-top: 18px; padding-top: 14px; }
+.triage h4 { margin: 12px 0 8px; font-size: .82rem; color: var(--hint); font-weight: 600; }
 .triage h4:first-child { margin-top: 0; }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chips { display: flex; flex-wrap: wrap; gap: 7px; }
 .chip {
   border: 1px solid var(--line); border-radius: 999px;
-  background: transparent; color: var(--hint);
+  background: var(--elev); color: var(--hint);
   font: inherit; font-size: .82rem; font-weight: 600;
-  padding: 7px 13px; cursor: pointer;
+  padding: 8px 14px; cursor: pointer;
 }
-.chip.selected { background: var(--text); border-color: var(--text); color: var(--card); }
+.chip.selected {
+  background: var(--mint-soft);
+  border-color: var(--mint);
+  color: var(--mint);
+}
 
 /* ---- overlays ---- */
 .lightbox {
   position: fixed; inset: 0; z-index: 50;
-  background: rgba(0,0,0,.88);
+  background: rgba(5, 6, 4, .92);
   display: flex; align-items: center; justify-content: center;
   cursor: zoom-out; padding: 16px;
 }
-.lightbox img { max-width: 100%; max-height: 100%; border-radius: 6px; }
+.lightbox img { max-width: 100%; max-height: 100%; border-radius: 8px; }
 
 .toast {
   position: fixed; left: 50%; bottom: calc(28px + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
-  background: var(--text); color: var(--card);
-  padding: 10px 18px; border-radius: 999px;
-  font-size: .88rem; font-weight: 600; z-index: 60;
+  background: var(--mint); color: var(--bg);
+  padding: 11px 20px; border-radius: 999px;
+  font-size: .88rem; font-weight: 700; z-index: 60;
   max-width: 88vw; text-align: center;
 }
 

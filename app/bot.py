@@ -143,8 +143,8 @@ async def cmd_start(message: Message) -> None:
     await message.answer(text, reply_markup=kb)
 
 
-@router.message(Command("app"))
-async def cmd_app(message: Message) -> None:
+@router.message(Command("feedback"))
+async def cmd_feedback(message: Message) -> None:
     """Post an open-the-tracker button. In the group, pin the reply."""
     if message.chat.type in GROUP_TYPES:
         _remember_group(message.chat.id)

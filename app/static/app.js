@@ -7,6 +7,11 @@ if (inTg) {
   document.body.classList.add("in-tg");
   tg.ready();
   tg.expand();
+  try {
+    tg.setHeaderColor("#0c0d0a");
+    tg.setBackgroundColor("#0c0d0a");
+    tg.MainButton.setParams({ color: "#8de3be", text_color: "#0c0d0a" });
+  } catch (e) { /* older clients */ }
 }
 
 const S = {
@@ -188,7 +193,7 @@ function renderList() {
   for (const [status, label] of groups) {
     const rows = items.filter((s) => s.status === status).sort(byVotes);
     if (!rows.length) continue;
-    list.append(el("div", "section-label", label));
+    list.append(el("div", "section-label sl-" + status, label));
     rows.forEach((s) => list.append(card(s)));
   }
 }

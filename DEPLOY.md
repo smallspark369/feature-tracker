@@ -36,7 +36,7 @@ Volumes — without it, data is lost on redeploys).
 
 1. Add the bot to your community group (the bot notices and remembers the
    group automatically — this is where completion announcements will go).
-2. Type `/app` in the group. The bot replies with an "Open the tracker"
+2. Type `/feedback` in the group. The bot replies with an "Open the tracker"
    button — **pin that message** so it's always one tap away.
 
 Done. **Group admins are automatically tracker admins** — anyone who's an
@@ -57,7 +57,7 @@ groups). To make it one tap:
 2. BotFather gives you a link like `https://t.me/AppNameTrackerBot/tracker`.
    Add it as an environment variable on your service:
    `MINIAPP_LINK=https://t.me/AppNameTrackerBot/tracker`
-3. Redeploy/restart, then run `/app` in the group again and re-pin.
+3. Redeploy/restart, then run `/feedback` in the group again and re-pin.
 
 ## If something looks wrong
 
@@ -65,8 +65,8 @@ groups). To make it one tap:
   URL. Set `PUBLIC_URL=https://your-service-url` as an environment variable
   and restart.
 - **Completions aren't announced in the group** — make sure the bot is still
-  in the group, then type `/app` in the group once (that re-registers it).
-- **Moving to a new group** — just add the bot there and type `/app`; the
+  in the group, then type `/feedback` in the group once (that re-registers it).
+- **Moving to a new group** — just add the bot there and type `/feedback`; the
   newest group wins.
 - **Bot doesn't respond to commands at all** — check the service logs for a
   BOT_TOKEN error; re-paste the token from BotFather.

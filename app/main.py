@@ -51,6 +51,16 @@ async def lifespan(app: FastAPI):
         app.state.bot = bot
         app.state.dp = dp
 
+        try:
+            from aiogram.types import BotCommand
+
+            await bot.set_my_commands([
+                BotCommand(command="feedback", description="Open the feedback tracker"),
+                BotCommand(command="chatid", description="Show this chat's ID"),
+            ])
+        except Exception:
+            log.warning("Could not register bot commands (network?).")
+
         webhook_ok = False
         if settings.public_url:
             try:
