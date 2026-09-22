@@ -1,0 +1,14 @@
+# Render Blueprint — enables the one-click "Deploy to Render" flow.
+# https://render.com/deploy?repo=<your-github-repo-url>
+services:
+  - type: web
+    name: feature-tracker
+    runtime: docker
+    plan: starter          # starter plan required: free plan has no disk, so data would be wiped on redeploy
+    disk:
+      name: tracker-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: BOT_TOKEN
+        sync: false        # prompts the person deploying to paste it

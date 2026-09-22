@@ -1,0 +1,7 @@
+.env
+.venv
+tracker.db*
+uploads/
+__pycache__/
+*.pyc
+scripts/

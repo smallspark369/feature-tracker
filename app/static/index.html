@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>Tracker</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- List -->
+    <section id="view-list" class="view">
+      <header class="topbar">
+        <button id="fallback-new" class="ghost-btn hide-in-tg" type="button">+ New</button>
+        <nav id="tabs" class="tabs" role="tablist">
+          <button class="tab active" data-tab="all" role="tab">All</button>
+          <button class="tab" data-tab="idea" role="tab">Ideas</button>
+          <button class="tab" data-tab="bug" role="tab">Bugs</button>
+          <button class="tab" data-tab="done" role="tab">Done</button>
+        </nav>
+      </header>
+      <main id="list" class="list" aria-live="polite"></main>
+    </section>
+
+    <!-- Submit -->
+    <section id="view-submit" class="view" hidden>
+      <header class="subhead">
+        <button class="back-btn hide-in-tg" data-back type="button">‹ Back</button>
+        <h2>New submission</h2>
+      </header>
+      <form id="submit-form" class="form">
+        <div class="kind-toggle" role="radiogroup" aria-label="Type">
+          <button type="button" class="kind active" data-kind="idea">Idea</button>
+          <button type="button" class="kind" data-kind="bug">Bug</button>
+        </div>
+        <label class="field">
+          <span>Title</span>
+          <input id="f-title" type="text" maxlength="120" placeholder="One line, like a headline" required>
+        </label>
+        <label class="field">
+          <span>Details</span>
+          <textarea id="f-desc" rows="6" maxlength="4000"
+            placeholder="What should happen? For bugs: what did you do, what did you expect, what happened instead."></textarea>
+        </label>
+        <div class="field">
+          <span>Screenshots</span>
+          <div id="previews" class="previews"></div>
+          <label class="file-btn">
+            Add screenshots
+            <input id="f-files" type="file" accept="image/*" multiple hidden>
+          </label>
+          <p class="hint">Up to 4 images.</p>
+        </div>
+        <button id="fallback-submit" class="primary-btn hide-in-tg" type="submit">Submit</button>
+      </form>
+    </section>
+
+    <!-- Detail -->
+    <section id="view-detail" class="view" hidden>
+      <header class="subhead">
+        <button class="back-btn hide-in-tg" data-back type="button">‹ Back</button>
+        <h2 id="d-eyebrow"></h2>
+      </header>
+      <article id="detail" class="detail"></article>
+    </section>
+
+  </div>
+
+  <div id="lightbox" class="lightbox" hidden><img alt="Screenshot"></div>
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
