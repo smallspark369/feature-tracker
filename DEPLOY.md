@@ -34,15 +34,19 @@ Volumes — without it, data is lost on redeploys).
 
 ## 3. Connect it to the group (2 minutes)
 
-1. Add the bot to your community group (the bot notices and remembers the
-   group automatically — this is where completion announcements will go).
+1. Add the bot to your community group. The bot **binds itself to the
+   first group it's added to**: only that group's members can open the
+   tracker, its admins get the triage controls, and completion
+   announcements go there. Adding the bot to any other group later does
+   nothing — it stays bound.
 2. Type `/feedback` in the group. The bot replies with an "Open the tracker"
    button — **pin that message** so it's always one tap away.
 
 Done. **Group admins are automatically tracker admins** — anyone who's an
-admin of the group can set priorities and statuses; everyone else can file
-ideas/bugs and vote. Promoting someone to group admin makes them a tracker
-admin within ~5 minutes, no config anywhere.
+admin of the group can set priorities and statuses and delete submissions;
+other group members can file ideas/bugs and vote; people outside the group
+can't use the app at all. Promoting someone to group admin makes them a
+tracker admin within ~5 minutes, no config anywhere.
 
 ## Optional polish: one-tap opening from the group
 
@@ -66,7 +70,8 @@ groups). To make it one tap:
   and restart.
 - **Completions aren't announced in the group** — make sure the bot is still
   in the group, then type `/feedback` in the group once (that re-registers it).
-- **Moving to a new group** — just add the bot there and type `/feedback`; the
-  newest group wins.
+- **Moving to a new group** — add the bot to the new group, then have a
+  current admin type `/setgroup` there. (Anyone else adding the bot
+  somewhere gets nothing — it stays bound to your community.)
 - **Bot doesn't respond to commands at all** — check the service logs for a
   BOT_TOKEN error; re-paste the token from BotFather.

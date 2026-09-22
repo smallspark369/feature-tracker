@@ -136,6 +136,12 @@ def main() -> None:
         from app.bot import current_group_id
         assert current_group_id() == -100123
 
+        # once bound, membership is enforced. Telegram is unreachable here,
+        # so verification fails -> unknown users are locked out (fail closed)…
+        assert c.get("/api/me", headers=member).status_code == 403
+        # …while ADMIN_IDS-listed admins keep access regardless.
+        assert c.get("/api/me", headers=admin).status_code == 200
+
         # frontend is served
         assert "telegram-web-app.js" in c.get("/").text
 

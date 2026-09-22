@@ -31,10 +31,12 @@ Everything else is automatic:
 - **Public URL** — detected from the platform (Render/Railway/Fly), or set
   `PUBLIC_URL` manually.
 - **Transport** — webhook when a public URL is known, long polling otherwise.
-- **Announcement group** — captured when the bot is added to a group
-  (re-captured wherever `/feedback` is run, so moving groups is trivial).
-- **Admins** — the group's own admin list, fetched live and cached 5 min.
-  `ADMIN_IDS` adds extras.
+- **Community binding** — the bot locks to the first group it's added to.
+  Only that group's members can open the app (verified live via
+  `getChatMember`), announcements go there, and other groups adding the
+  bot get nothing. Move the binding with `/setgroup` (current admins only).
+- **Admins** — the bound group's own admin list, fetched live and cached
+  5 min. `ADMIN_IDS` adds extras.
 
 The Docker image keeps all state (SQLite DB + screenshots) under `/data` —
 mount a persistent volume there and that's the entire backup surface.
@@ -62,8 +64,9 @@ DEPLOY.md        the guide to hand to whoever deploys it
 - **Members** open the tracker from the pinned button, file ideas or bugs
   (title, details, up to 4 screenshots), and upvote what they care about.
 - **Group admins** see extra controls on each item: status (Open / Planned /
-  In progress / Completed / Declined) and priority (Low → Critical).
-  Unsorted items are flagged so the triage backlog is visible.
+  In progress / Completed / Declined), priority (Low → Critical), and
+  delete. Unsorted items are flagged so the triage backlog is visible.
+- **Non-members** of the bound group can't use the app at all.
 - Marking something **Completed** posts an announcement to the group with a
   button back into the tracker — "🐞 Fixed" for bugs, "✅ Shipped" for ideas.
 - The board groups active items as In progress / Planned / Open, sorted by

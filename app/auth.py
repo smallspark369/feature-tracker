@@ -47,7 +47,7 @@ def _display_name(user: dict) -> str:
 
 async def current_user(authorization: str = Header(default="")) -> dict:
     """FastAPI dependency. Expects `Authorization: tma <initData>`."""
-    from .bot import resolve_admin_ids  # late import to avoid cycles
+    from .bot import is_group_member, resolve_admin_ids  # late import to avoid cycles
 
     scheme, _, data = authorization.partition(" ")
     if scheme.lower() == "tma" and data:
@@ -55,11 +55,17 @@ async def current_user(authorization: str = Header(default="")) -> dict:
             user = verify_init_data(data, settings.bot_token)
         except Exception:
             raise HTTPException(status_code=401, detail="Invalid Telegram signature.")
+        is_admin = user["id"] in await resolve_admin_ids()
+        if not is_admin and not await is_group_member(user["id"]):
+            raise HTTPException(
+                status_code=403,
+                detail="This tracker is private to its community's group chat.",
+            )
         return {
             "id": user["id"],
             "name": _display_name(user),
             "username": user.get("username"),
-            "is_admin": user["id"] in await resolve_admin_ids(),
+            "is_admin": is_admin,
         }
 
     # Local-development escape hatch (see DEV_USER_ID in .env.example).
