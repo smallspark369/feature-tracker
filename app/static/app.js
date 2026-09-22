@@ -58,6 +58,14 @@ function toast(msg) {
   t._timer = setTimeout(() => { t.hidden = true; }, 2200);
 }
 
+function confirmThen(msg, fn) {
+  if (inTg && tg.showConfirm) {
+    tg.showConfirm(msg, (ok) => { if (ok) fn(); });
+  } else if (window.confirm(msg)) {
+    fn();
+  }
+}
+
 function haptic(kind) {
   if (inTg && tg.HapticFeedback) {
     try { tg.HapticFeedback.impactOccurred(kind || "light"); } catch (e) { /* ignore */ }
@@ -340,6 +348,16 @@ function triagePanel(s) {
 
   mkChips("Status", STATUSES, s.status, "status", (v) => STATUS_LABEL[v]);
   mkChips("Priority", PRIORITIES, s.priority, "priority", (v) => v);
+
+  const zone = el("div", "danger-zone");
+  const del = el("button", "danger-btn", "Delete submission");
+  del.type = "button";
+  del.addEventListener("click", () =>
+    confirmThen(`Delete #${s.id} "${s.title}" permanently? This can't be undone.`, () => deleteSubmission(s.id))
+  );
+  zone.append(del);
+  wrap.append(zone);
+
   renderFallbackSave(wrap);
   return wrap;
 }
@@ -354,7 +372,7 @@ function renderFallbackSave(wrap) {
     btn.style.marginTop = "14px";
     btn.style.width = "100%";
     btn.addEventListener("click", saveTriage);
-    wrap.append(btn);
+    wrap.insertBefore(btn, wrap.querySelector(".danger-zone"));
   } else if (!dirty && btn) {
     btn.remove();
   }
@@ -374,6 +392,20 @@ async function saveTriage() {
     syncChrome();
     haptic("medium");
     toast(r.announced ? "Saved — announced in the group chat" : "Saved");
+    refresh();
+  } catch (e) {
+    toast(e.message);
+  }
+}
+
+async function deleteSubmission(id) {
+  try {
+    await api(`/api/submissions/${id}`, { method: "DELETE" });
+    haptic("medium");
+    toast("Deleted");
+    S.detail = null;
+    S.triage = {};
+    show("list");
     refresh();
   } catch (e) {
     toast(e.message);

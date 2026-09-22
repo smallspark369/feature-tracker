@@ -116,3 +116,17 @@ async def triage(sid: int, patch: TriagePatch, user: dict = Depends(current_user
 
     after["announced"] = announced
     return after
+
+
+@router.delete("/submissions/{sid}")
+async def delete_submission(sid: int, user: dict = Depends(current_user)):
+    if not user["is_admin"]:
+        raise HTTPException(403, "Only admins can delete submissions.")
+    if db.get_submission(sid, user["id"]) is None:
+        raise HTTPException(404, "Not found.")
+    for filename in db.delete_submission(sid):
+        try:
+            (settings.upload_dir / filename).unlink(missing_ok=True)
+        except OSError:
+            pass
+    return {"ok": True}

@@ -147,6 +147,22 @@ def toggle_vote(sid: int, user_id: int) -> tuple[int, bool]:
     return votes, my_vote
 
 
+def delete_submission(sid: int) -> list[str]:
+    """Delete a submission (votes and attachment rows cascade).
+
+    Returns the stored attachment filenames so the caller can remove the
+    files from disk.
+    """
+    conn = get_conn()
+    files = [
+        r["filename"]
+        for r in conn.execute("SELECT filename FROM attachments WHERE submission_id = ?", (sid,))
+    ]
+    conn.execute("DELETE FROM submissions WHERE id = ?", (sid,))
+    conn.commit()
+    return files
+
+
 def update_submission(sid: int, status: str | None, priority: str | None) -> None:
     sets, params = [], []
     if status is not None:

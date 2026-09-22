@@ -107,6 +107,21 @@ def main() -> None:
         items = c.get("/api/submissions", headers=member).json()
         assert items[0]["votes"] == 1 and items[0]["my_vote"] is True
 
+        # deletion: admin-only, removes record and screenshot files from disk
+        r = c.post(
+            "/api/submissions", headers=member,
+            data={"kind": "idea", "title": "Temporary idea"},
+            files=[("files", ("shot2.png", PNG_1PX, "image/png"))],
+        )
+        del_id = r.json()["id"]
+        del_file = c.get(f"/api/submissions/{del_id}", headers=member).json()["attachments"][0]["filename"]
+        assert (Path(os.environ["UPLOAD_DIR"]) / del_file).exists()
+        assert c.delete(f"/api/submissions/{del_id}", headers=member).status_code == 403
+        assert c.delete(f"/api/submissions/{del_id}", headers=admin).status_code == 200
+        assert c.get(f"/api/submissions/{del_id}", headers=member).status_code == 404
+        assert not (Path(os.environ["UPLOAD_DIR"]) / del_file).exists()
+        assert c.delete(f"/api/submissions/{del_id}", headers=admin).status_code == 404
+
         # webhook endpoint enforces the secret header
         assert c.post("/tg/webhook", json={"update_id": 1}).status_code == 403
         import hashlib as _h

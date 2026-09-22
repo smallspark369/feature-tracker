@@ -261,3 +261,12 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; }
 }
+
+/* ---- admin danger zone ---- */
+.danger-zone { margin-top: 18px; }
+.danger-btn {
+  width: 100%; padding: 12px; border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--c-bug) 45%, transparent);
+  background: transparent; color: var(--c-bug);
+  font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer;
+}
