@@ -128,21 +128,21 @@ async def is_group_member(user_id: int) -> bool:
 async def _group_button() -> InlineKeyboardMarkup | None:
     """Open-the-tracker button that works from a group chat."""
     if settings.miniapp_link:
-        btn = InlineKeyboardButton(text="Open the tracker", url=settings.miniapp_link)
+        btn = InlineKeyboardButton(text="Launch Feedback Bot", url=settings.miniapp_link)
     else:
         username = await bot_username()
         if not username:
             return None
-        btn = InlineKeyboardButton(text="Open the tracker", url=f"https://t.me/{username}?start=open")
+        btn = InlineKeyboardButton(text="Launch Feedback Bot", url=f"https://t.me/{username}?start=open")
     return InlineKeyboardMarkup(inline_keyboard=[[btn]])
 
 
 def _private_button() -> InlineKeyboardMarkup | None:
     """In private chats a web_app button opens the app instantly."""
     if settings.public_url:
-        btn = InlineKeyboardButton(text="Open the tracker", web_app=WebAppInfo(url=settings.public_url))
+        btn = InlineKeyboardButton(text="Launch Feedback Bot", web_app=WebAppInfo(url=settings.public_url))
     elif settings.miniapp_link:
-        btn = InlineKeyboardButton(text="Open the tracker", url=settings.miniapp_link)
+        btn = InlineKeyboardButton(text="Launch Feedback Bot", url=settings.miniapp_link)
     else:
         return None
     return InlineKeyboardMarkup(inline_keyboard=[[btn]])
