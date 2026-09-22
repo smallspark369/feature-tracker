@@ -68,6 +68,12 @@ def get_kv(key: str) -> str | None:
     return row["value"] if row else None
 
 
+def delete_kv(key: str) -> None:
+    conn = get_conn()
+    conn.execute("DELETE FROM kv WHERE key = ?", (key,))
+    conn.commit()
+
+
 def set_kv(key: str, value: str) -> None:
     conn = get_conn()
     conn.execute(

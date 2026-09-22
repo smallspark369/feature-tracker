@@ -65,6 +65,9 @@ class Settings:
     group_chat_id: int | None = field(default_factory=lambda: _parse_optional_int(os.getenv("GROUP_CHAT_ID")))
     # t.me direct link from @BotFather /newapp (optional one-tap polish).
     miniapp_link: str = os.getenv("MINIAPP_LINK", "")
+    # Recovery key for the /unbind command (DM the bot: /unbind <key>).
+    # Unset = command disabled.
+    reset_key: str = os.getenv("RESET_KEY", "")
 
     # --- auto-detected ---
     public_url: str = field(default_factory=_detect_public_url)

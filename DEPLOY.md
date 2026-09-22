@@ -81,5 +81,11 @@ groups). To make it one tap:
   current admin type `/setgroup` there. (Anyone else adding the bot
   somewhere, or running `/setgroup` once it's bound, gets nothing — it
   stays bound to your community.)
+- **Locked out — e.g. the bound group was deleted** — add an environment
+  variable `RESET_KEY` (any long random string) on the service and restart,
+  then send the bot a **private message**: `/unbind <that key>`. The
+  tracker returns to unbound test mode; run `/setgroup` in the right group
+  to bind it again. Setting `ADMIN_IDS=<your user id>` also always restores
+  your own access, since env-listed admins bypass the membership gate.
 - **Bot doesn't respond to commands at all** — check the service logs for a
   BOT_TOKEN error; re-paste the token from BotFather.

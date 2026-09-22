@@ -142,6 +142,11 @@ def main() -> None:
         # …while ADMIN_IDS-listed admins keep access regardless.
         assert c.get("/api/me", headers=admin).status_code == 200
 
+        # unbinding (what /unbind does) reopens the app
+        _db.delete_kv("group_chat_id")
+        assert current_group_id() is None
+        assert c.get("/api/me", headers=member).status_code == 200
+
         # frontend is served
         assert "telegram-web-app.js" in c.get("/").text
 

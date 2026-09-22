@@ -11,12 +11,13 @@ Security model — the tracker is bound to ONE community, explicitly:
   /setgroup in the new group. A GROUP_CHAT_ID env var pins it harder
   than anything else.
 """
+import hmac
 import html
 import logging
 import time
 
 from aiogram import Bot, Router
-from aiogram.filters import Command, CommandStart
+from aiogram.filters import Command, CommandObject, CommandStart
 from aiogram.types import (
     ChatMemberUpdated,
     InlineKeyboardButton,
@@ -71,6 +72,12 @@ def current_group_id() -> int | None:
 
 def _lock_group(chat_id: int) -> None:
     db.set_kv("group_chat_id", str(chat_id))
+    _admin_cache.clear()
+    _member_cache.clear()
+
+
+def _unbind_group() -> None:
+    db.delete_kv("group_chat_id")
     _admin_cache.clear()
     _member_cache.clear()
 
@@ -215,6 +222,40 @@ async def cmd_setgroup(message: Message) -> None:
         )
     else:
         await message.answer("Only an admin of the currently bound community can move the tracker.")
+
+
+@router.message(Command("unbind"))
+async def cmd_unbind(message: Message, command: CommandObject) -> None:
+    """Recovery: clear the group binding, gated by the RESET_KEY env var.
+
+    DM-only so the key never appears in a group chat. Returns the tracker
+    to unbound test mode regardless of where it was bound — including a
+    group that no longer exists.
+    """
+    if message.chat.type != "private":
+        await message.answer("For safety, send /unbind in a private chat with me.")
+        return
+    if not settings.reset_key:
+        await message.answer(
+            "Unbind is disabled. Set a RESET_KEY environment variable on the "
+            "server, restart, then send /unbind &lt;key&gt; here."
+        )
+        return
+    supplied = (command.args or "").strip()
+    if not supplied or not hmac.compare_digest(supplied, settings.reset_key):
+        await message.answer("Invalid key.")
+        return
+    if settings.group_chat_id is not None:
+        await message.answer(
+            "The group is pinned by the GROUP_CHAT_ID environment variable — remove it there."
+        )
+        return
+    _unbind_group()
+    log.warning("Group binding cleared via /unbind by user %s.", message.from_user.id if message.from_user else "?")
+    await message.answer(
+        "Binding cleared — the tracker is unbound (open test mode).\n"
+        "Run /setgroup in the right group soon to lock it again."
+    )
 
 
 @router.message(Command("chatid"))
