@@ -1,13 +1,15 @@
 """Telegram bot: entry points into the Mini App + group announcements.
 
-Security model — the tracker is bound to ONE community:
-- The bot locks to the first group it's added to. Adding it to any other
-  group does nothing; it stays bound.
-- Only members of the bound group can use the Mini App at all (verified
-  live via getChatMember, cached 5 minutes).
-- Only the bound group's admins (plus ADMIN_IDS extras) can triage/delete.
-- Moving the binding requires a current admin to run /setgroup in the new
-  group. A GROUP_CHAT_ID env var pins it harder than anything else.
+Security model — the tracker is bound to ONE community, explicitly:
+- Nothing binds automatically. Until someone runs /setgroup, the app is
+  open (test mode): anyone with the link can use it, and only ADMIN_IDS
+  are admins.
+- /setgroup in a group binds the tracker to it: only that group's members
+  can use the Mini App at all (verified live via getChatMember, cached
+  5 minutes), and its admins (plus ADMIN_IDS extras) triage/delete.
+- Once bound, moving the binding requires a current admin to run
+  /setgroup in the new group. A GROUP_CHAT_ID env var pins it harder
+  than anything else.
 """
 import html
 import logging
@@ -71,14 +73,6 @@ def _lock_group(chat_id: int) -> None:
     db.set_kv("group_chat_id", str(chat_id))
     _admin_cache.clear()
     _member_cache.clear()
-
-
-def _try_capture(chat_id: int) -> bool:
-    """Bind only if nothing is bound yet — first group wins, permanently."""
-    if current_group_id() is None:
-        _lock_group(chat_id)
-        return True
-    return False
 
 
 # ---- access control: the bound group's members and admins ----
@@ -158,11 +152,13 @@ def _private_button() -> InlineKeyboardMarkup | None:
 
 @router.my_chat_member()
 async def on_membership_change(event: ChatMemberUpdated) -> None:
+    """Joining a group binds nothing — /setgroup is the only way to bind."""
     if event.chat.type in GROUP_TYPES and event.new_chat_member.status in ("member", "administrator"):
-        if _try_capture(event.chat.id):
-            log.info("Bound to group %s (%s).", event.chat.id, event.chat.title)
-        elif event.chat.id != current_group_id():
-            log.info("Added to group %s but already bound elsewhere; ignoring.", event.chat.id)
+        bound = current_group_id()
+        state = "unbound (test mode) — run /setgroup here to lock it" if bound is None else (
+            "the bound community" if event.chat.id == bound else "bound elsewhere; this group gets nothing"
+        )
+        log.info("Added to group %s (%s): %s.", event.chat.id, event.chat.title, state)
 
 
 @router.message(CommandStart())
@@ -185,9 +181,7 @@ async def cmd_feedback(message: Message) -> None:
     """Post an open-the-tracker button. In the bound group, pin the reply."""
     if message.chat.type in GROUP_TYPES:
         gid = current_group_id()
-        if gid is None:
-            _lock_group(message.chat.id)
-        elif message.chat.id != gid:
+        if gid is not None and message.chat.id != gid:
             await message.answer("This tracker is bound to another community's group chat.")
             return
         kb = await _group_button()

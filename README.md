@@ -24,17 +24,18 @@ One Python process runs everything: the web app, its API, and the bot.
 **See [DEPLOY.md](DEPLOY.md)** — written so a non-developer mod can do it in
 a browser in ~10 minutes. The short version: create a bot with @BotFather,
 deploy this repo to Render/Railway with `BOT_TOKEN` as the only variable,
-add the bot to the group, type `/feedback`, pin the message.
+add the bot to the group, type `/setgroup` then `/feedback`, pin the message.
 
 Everything else is automatic:
 
 - **Public URL** — detected from the platform (Render/Railway/Fly), or set
   `PUBLIC_URL` manually.
 - **Transport** — webhook when a public URL is known, long polling otherwise.
-- **Community binding** — the bot locks to the first group it's added to.
-  Only that group's members can open the app (verified live via
-  `getChatMember`), announcements go there, and other groups adding the
-  bot get nothing. Move the binding with `/setgroup` (current admins only).
+- **Community binding** — `/setgroup` in a group locks the tracker to it:
+  only that group's members can open the app (verified live via
+  `getChatMember`), announcements go there, and other groups get nothing.
+  Until `/setgroup` is run the app is open (test mode). Rebinding once
+  bound requires a current admin.
 - **Admins** — the bound group's own admin list, fetched live and cached
   5 min. `ADMIN_IDS` adds extras.
 
