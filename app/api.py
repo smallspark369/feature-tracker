@@ -156,6 +156,7 @@ class NotifySettingsPatch(BaseModel):
     status: bool | None = None
     priority: bool | None = None
     votes: bool | None = None
+    button: bool | None = None
 
 
 @router.get("/settings")

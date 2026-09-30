@@ -268,7 +268,7 @@ async def cmd_chatid(message: Message) -> None:
 
 # ---- announcements ----
 
-NOTIFY_DEFAULTS = {"completed": True, "new": False, "status": False, "priority": False, "votes": False}
+NOTIFY_DEFAULTS = {"completed": True, "new": False, "status": False, "priority": False, "votes": False, "button": True}
 
 STATUS_LABEL = {
     "open": "Open", "planned": "Planned", "in_progress": "In progress",
@@ -307,8 +307,9 @@ async def _announce(text: str) -> bool:
     gid = current_group_id()
     if bot is None or gid is None:
         return False
+    kb = await _group_button() if get_notify_settings()["button"] else None
     try:
-        await bot.send_message(gid, text, reply_markup=await _group_button())
+        await bot.send_message(gid, text, reply_markup=kb)
         return True
     except Exception:
         log.exception("Failed to announce to group chat")

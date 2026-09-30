@@ -485,6 +485,7 @@ const SETTING_ROWS = [
   { key: "status", label: "Status changes", desc: "Announce Planned, In progress, and Declined updates" },
   { key: "priority", label: "Priority changes", desc: "Announce when an item's priority is set" },
   { key: "votes", label: "Upvotes", desc: "Announce each upvote — noisy in active communities" },
+  { key: "button", label: "Launch button", desc: "Attach the Launch Feedback Bot button to announcements" },
 ];
 
 async function openSettings() {

@@ -110,7 +110,9 @@ def main() -> None:
         # notification settings: admin-only, sane defaults, persistence
         assert c.get("/api/settings", headers=member).status_code == 403
         st = c.get("/api/settings", headers=admin).json()
-        assert st == {"completed": True, "new": False, "status": False, "priority": False, "votes": False}
+        assert st == {"completed": True, "new": False, "status": False, "priority": False, "votes": False, "button": True}
+        assert c.patch("/api/settings", headers=admin, json={"button": False}).json()["button"] is False
+        assert c.patch("/api/settings", headers=admin, json={"button": True}).json()["button"] is True
         st = c.patch("/api/settings", headers=admin, json={"new": True, "votes": True}).json()
         assert st["new"] is True and st["votes"] is True and st["completed"] is True
         assert c.get("/api/settings", headers=admin).json()["votes"] is True
