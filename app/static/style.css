@@ -300,3 +300,27 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
 }
 .switch.on { background: var(--mint); border-color: var(--mint); }
 .switch.on::after { transform: translateX(20px); background: var(--bg); }
+
+/* ---- branded header band ---- */
+#hero {
+  position: relative;
+  max-width: 640px; margin: 0 auto;
+  height: 84px;
+  background: url("header-bg.jpg") center / cover no-repeat, var(--panel);
+  border-radius: 0 0 16px 16px;
+  overflow: hidden;
+  display: flex; align-items: flex-end;
+}
+#hero::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(12, 13, 10, .62), rgba(12, 13, 10, .05));
+}
+.hero-text { position: relative; padding: 12px 16px 11px; }
+.hero-text h1 {
+  margin: 0; font-size: 1.12rem; font-weight: 800; letter-spacing: .02em;
+  color: var(--text);
+}
+.hero-text p {
+  margin: 2px 0 0; font-size: .74rem; font-weight: 500;
+  color: rgba(236, 238, 233, .72);
+}
