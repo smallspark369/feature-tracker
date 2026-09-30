@@ -39,18 +39,11 @@ body.in-tg .hide-in-tg { display: none; }
 
 /* ---- top bar: underlined text tabs, like the app's Configuration | Schedule ---- */
 .topbar {
-  position: sticky;
-  top: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
-  z-index: 5;
+  position: sticky; top: 0; z-index: 5;
   display: flex; gap: 10px; align-items: center;
   padding: 12px 0 0;
   background: var(--bg);
   border-bottom: 1px solid var(--line);
-}
-.topbar::before {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 100%;
-  height: calc(var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
-  background: var(--bg);
 }
 .tabs { flex: 1; display: flex; gap: 22px; }
 .tab {
@@ -312,7 +305,7 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
 #hero {
   position: relative;
   max-width: 640px; margin: 0 auto;
-  min-height: calc(84px + var(--tg-safe-area-inset-top, 0px) + var(--tg-content-safe-area-inset-top, 0px));
+  height: 84px;
   background: url("header-bg.jpg") center / cover no-repeat, var(--panel);
   border-radius: 0 0 16px 16px;
   overflow: hidden;
