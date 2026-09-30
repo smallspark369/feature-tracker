@@ -12,6 +12,15 @@ if (inTg) {
     tg.setBackgroundColor("#0c0d0a");
     tg.MainButton.setParams({ color: "#8de3be", text_color: "#0c0d0a" });
   } catch (e) { /* older clients */ }
+  // Fullscreen on phones: drops Telegram's header bar; its compact menu/close
+  // pill floats over the hero instead. Desktop keeps the small title bar on
+  // purpose (fullscreen there would take over the whole monitor).
+  try {
+    if ((tg.platform === "android" || tg.platform === "ios") &&
+        tg.isVersionAtLeast && tg.isVersionAtLeast("8.0")) {
+      tg.requestFullscreen();
+    }
+  } catch (e) { /* not supported */ }
 }
 
 const S = {
