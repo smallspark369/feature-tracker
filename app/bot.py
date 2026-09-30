@@ -13,6 +13,7 @@ Security model — the tracker is bound to ONE community, explicitly:
 """
 import hmac
 import html
+import json
 import logging
 import time
 
@@ -267,22 +268,91 @@ async def cmd_chatid(message: Message) -> None:
 
 # ---- announcements ----
 
-async def announce_completed(sub: dict, votes: int) -> bool:
-    """Post a completion notice to the bound group. Returns True if sent."""
+NOTIFY_DEFAULTS = {"completed": True, "new": False, "status": False, "priority": False, "votes": False}
+
+STATUS_LABEL = {
+    "open": "Open", "planned": "Planned", "in_progress": "In progress",
+    "completed": "Completed", "declined": "Declined",
+}
+PRIORITY_LABEL = {
+    "unsorted": "Unsorted", "low": "Low", "medium": "Medium",
+    "high": "High", "critical": "Critical",
+}
+
+
+def get_notify_settings() -> dict:
+    out = dict(NOTIFY_DEFAULTS)
+    raw = db.get_kv("notify_settings")
+    if raw:
+        try:
+            saved = json.loads(raw)
+            out.update({k: bool(v) for k, v in saved.items() if k in NOTIFY_DEFAULTS})
+        except ValueError:
+            pass
+    return out
+
+
+def set_notify_settings(patch: dict) -> dict:
+    current = get_notify_settings()
+    for key, value in patch.items():
+        if key in NOTIFY_DEFAULTS:
+            current[key] = bool(value)
+    db.set_kv("notify_settings", json.dumps(current))
+    return current
+
+
+async def _announce(text: str) -> bool:
+    """Send a notice to the bound group. Returns True if sent."""
     bot = get_bot()
     gid = current_group_id()
     if bot is None or gid is None:
         return False
-
-    headline = "🐞 Fixed" if sub["kind"] == "bug" else "✅ Shipped"
-    title = html.escape(sub["title"])
-    by = html.escape(sub["submitter_name"])
-    vote_str = f" · {votes} vote{'s' if votes != 1 else ''}" if votes else ""
-    text = f"{headline}: <b>{title}</b>  (#{sub['id']})\nFiled by {by}{vote_str}"
-
     try:
         await bot.send_message(gid, text, reply_markup=await _group_button())
         return True
     except Exception:
-        log.exception("Failed to announce completion to group chat")
+        log.exception("Failed to announce to group chat")
         return False
+
+
+def _ref(sub: dict) -> str:
+    return f"<b>{html.escape(sub['title'])}</b>  (#{sub['id']})"
+
+
+async def announce_completed(sub: dict, votes: int) -> bool:
+    if not get_notify_settings()["completed"]:
+        return False
+    by = html.escape(sub["submitter_name"])
+    vote_str = f" · {votes} vote{'s' if votes != 1 else ''}" if votes else ""
+    return await _announce(f"✅ Completed: {_ref(sub)}\nFiled by {by}{vote_str}")
+
+
+async def announce_new_submission(sub: dict) -> bool:
+    if not get_notify_settings()["new"]:
+        return False
+    kind = "bug report" if sub["kind"] == "bug" else "idea"
+    by = html.escape(sub["submitter_name"])
+    return await _announce(f"🆕 New {kind}: {_ref(sub)}\nFiled by {by}")
+
+
+async def announce_status_change(sub: dict) -> bool:
+    if not get_notify_settings()["status"]:
+        return False
+    label = STATUS_LABEL.get(sub["status"], sub["status"])
+    return await _announce(f"📋 Status changed: {_ref(sub)} → <b>{label}</b>")
+
+
+async def announce_priority_change(sub: dict) -> bool:
+    if not get_notify_settings()["priority"]:
+        return False
+    label = PRIORITY_LABEL.get(sub["priority"], sub["priority"])
+    return await _announce(f"🔺 Priority set: {_ref(sub)} → <b>{label}</b>")
+
+
+async def announce_upvote(sub: dict, voter_name: str, votes: int) -> bool:
+    if not get_notify_settings()["votes"]:
+        return False
+    voter = html.escape(voter_name)
+    return await _announce(
+        f"👍 {voter} upvoted {_ref(sub)} · {votes} vote{'s' if votes != 1 else ''}"
+    )

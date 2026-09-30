@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <div id="app">
@@ -17,6 +17,7 @@
     <section id="view-list" class="view">
       <header class="topbar">
         <button id="fallback-new" class="ghost-btn hide-in-tg" type="button">+ New</button>
+        <button id="fallback-settings" class="ghost-btn" type="button" hidden aria-label="Settings">&#9881;</button>
         <nav id="tabs" class="tabs" role="tablist">
           <button class="tab active" data-tab="all" role="tab">All</button>
           <button class="tab" data-tab="idea" role="tab">Ideas</button>
@@ -69,11 +70,21 @@
       <article id="detail" class="detail"></article>
     </section>
 
+    <!-- Settings (admins) -->
+    <section id="view-settings" class="view" hidden>
+      <header class="subhead">
+        <button class="back-btn hide-in-tg" data-back type="button">&#8249; Back</button>
+        <h2>Group notifications</h2>
+      </header>
+      <p class="hint settings-intro">Choose what the bot announces in the community chat.</p>
+      <div id="settings-list" class="settings-list"></div>
+    </section>
+
   </div>
 
   <div id="lightbox" class="lightbox" hidden><img alt="Screenshot"></div>
   <div id="toast" class="toast" hidden></div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

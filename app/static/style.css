@@ -270,3 +270,33 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
   background: transparent; color: var(--c-bug);
   font: inherit; font-size: .9rem; font-weight: 600; cursor: pointer;
 }
+
+/* ---- settings (admin) ---- */
+.settings-intro { margin: 2px 2px 10px; }
+.settings-list {
+  display: flex; flex-direction: column;
+  background: var(--panel); border: 1px solid var(--line); border-radius: 14px;
+}
+.setting-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 16px; cursor: pointer;
+  border-bottom: 1px solid var(--line);
+}
+.setting-row:last-child { border-bottom: 0; }
+.setting-row .info { flex: 1; min-width: 0; }
+.setting-row .label { font-weight: 600; font-size: .95rem; }
+.setting-row .desc { color: var(--hint); font-size: .78rem; margin-top: 2px; line-height: 1.4; }
+.switch {
+  position: relative; flex-shrink: 0;
+  width: 46px; height: 26px; border-radius: 999px;
+  background: var(--elev); border: 1px solid var(--line);
+  transition: background .15s ease, border-color .15s ease;
+}
+.switch::after {
+  content: ""; position: absolute; top: 2px; left: 2px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--hint);
+  transition: transform .15s ease, background .15s ease;
+}
+.switch.on { background: var(--mint); border-color: var(--mint); }
+.switch.on::after { transform: translateX(20px); background: var(--bg); }

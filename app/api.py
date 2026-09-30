@@ -6,7 +6,15 @@ from pydantic import BaseModel
 
 from . import db
 from .auth import current_user
-from .bot import announce_completed
+from .bot import (
+    announce_completed,
+    announce_new_submission,
+    announce_priority_change,
+    announce_status_change,
+    announce_upvote,
+    get_notify_settings,
+    set_notify_settings,
+)
 from .config import settings
 
 router = APIRouter()
@@ -78,14 +86,19 @@ async def create_submission(
         (settings.upload_dir / name).write_bytes(data)
         db.add_attachment(sid, name, original)
 
-    return db.get_submission(sid, user["id"])
+    created = db.get_submission(sid, user["id"])
+    await announce_new_submission(created)
+    return created
 
 
 @router.post("/submissions/{sid}/vote")
 async def vote(sid: int, user: dict = Depends(current_user)):
-    if db.get_submission(sid, user["id"]) is None:
+    sub = db.get_submission(sid, user["id"])
+    if sub is None:
         raise HTTPException(404, "Not found.")
     votes, my_vote = db.toggle_vote(sid, user["id"])
+    if my_vote:
+        await announce_upvote(sub, user["name"], votes)
     return {"votes": votes, "my_vote": my_vote}
 
 
@@ -111,8 +124,13 @@ async def triage(sid: int, patch: TriagePatch, user: dict = Depends(current_user
     after = db.get_submission(sid, user["id"])
 
     announced = False
-    if patch.status == "completed" and before["status"] != "completed":
-        announced = await announce_completed(after, after["votes"])
+    if patch.status is not None and patch.status != before["status"]:
+        if patch.status == "completed":
+            announced = await announce_completed(after, after["votes"]) or announced
+        else:
+            announced = await announce_status_change(after) or announced
+    if patch.priority is not None and patch.priority != before["priority"]:
+        announced = await announce_priority_change(after) or announced
 
     after["announced"] = announced
     return after
@@ -130,3 +148,28 @@ async def delete_submission(sid: int, user: dict = Depends(current_user)):
         except OSError:
             pass
     return {"ok": True}
+
+
+class NotifySettingsPatch(BaseModel):
+    completed: bool | None = None
+    new: bool | None = None
+    status: bool | None = None
+    priority: bool | None = None
+    votes: bool | None = None
+
+
+@router.get("/settings")
+async def read_settings(user: dict = Depends(current_user)):
+    if not user["is_admin"]:
+        raise HTTPException(403, "Only admins can manage notification settings.")
+    return get_notify_settings()
+
+
+@router.patch("/settings")
+async def patch_settings(patch: NotifySettingsPatch, user: dict = Depends(current_user)):
+    if not user["is_admin"]:
+        raise HTTPException(403, "Only admins can manage notification settings.")
+    changes = patch.model_dump(exclude_none=True)
+    if not changes:
+        return get_notify_settings()
+    return set_notify_settings(changes)

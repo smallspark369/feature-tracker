@@ -95,6 +95,7 @@ function show(view) {
   $("#view-list").hidden = view !== "list";
   $("#view-submit").hidden = view !== "submit";
   $("#view-detail").hidden = view !== "detail";
+  $("#view-settings").hidden = view !== "settings";
   window.scrollTo(0, 0);
   syncChrome();
 }
@@ -127,6 +128,8 @@ function syncChrome() {
     } else {
       mb.hide();
     }
+  } else if (S.view === "settings") {
+    mb.hide();
   }
 }
 
@@ -474,6 +477,59 @@ async function submitForm() {
   }
 }
 
+/* ---------- settings (admins) ---------- */
+
+const SETTING_ROWS = [
+  { key: "completed", label: "Completions", desc: "Announce when something is marked Completed" },
+  { key: "new", label: "New submissions", desc: "Announce every new idea or bug report" },
+  { key: "status", label: "Status changes", desc: "Announce Planned, In progress, and Declined updates" },
+  { key: "priority", label: "Priority changes", desc: "Announce when an item's priority is set" },
+  { key: "votes", label: "Upvotes", desc: "Announce each upvote — noisy in active communities" },
+];
+
+async function openSettings() {
+  try {
+    S.settings = await api("/api/settings");
+  } catch (e) {
+    toast(e.message);
+    return;
+  }
+  renderSettings();
+  show("settings");
+}
+
+function renderSettings() {
+  const wrap = $("#settings-list");
+  wrap.replaceChildren();
+  for (const row of SETTING_ROWS) {
+    const r = el("div", "setting-row");
+    const info = el("div", "info");
+    info.append(el("div", "label", row.label), el("div", "desc", row.desc));
+    const sw = el("div", "switch" + (S.settings[row.key] ? " on" : ""));
+    r.append(info, sw);
+    r.addEventListener("click", () => toggleSetting(row.key, sw));
+    wrap.append(r);
+  }
+}
+
+async function toggleSetting(key, sw) {
+  const next = !S.settings[key];
+  S.settings[key] = next;
+  sw.classList.toggle("on", next);
+  haptic("light");
+  try {
+    S.settings = await api("/api/settings", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ [key]: next }),
+    });
+  } catch (e) {
+    S.settings[key] = !next;
+    sw.classList.toggle("on", !next);
+    toast(e.message);
+  }
+}
+
 /* ---------- wiring ---------- */
 
 $("#tabs").addEventListener("click", (ev) => {
@@ -486,6 +542,7 @@ $("#tabs").addEventListener("click", (ev) => {
 
 document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", goBack));
 $("#fallback-new").addEventListener("click", openSubmit);
+$("#fallback-settings").addEventListener("click", openSettings);
 
 $("#submit-form").addEventListener("submit", (ev) => { ev.preventDefault(); submitForm(); });
 
@@ -520,6 +577,17 @@ $("#lightbox").addEventListener("click", () => { $("#lightbox").hidden = true; }
   } catch (e) {
     renderError(e.message);
     return;
+  }
+  if (S.me.is_admin) {
+    let native = false;
+    if (inTg && tg.SettingsButton) {
+      try {
+        tg.SettingsButton.onClick(openSettings);
+        tg.SettingsButton.show();
+        native = true;
+      } catch (e) { /* older client */ }
+    }
+    if (!native) $("#fallback-settings").hidden = false;
   }
   syncChrome();
   refresh();

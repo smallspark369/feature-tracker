@@ -67,6 +67,10 @@ DEPLOY.md        the guide to hand to whoever deploys it
 - **Group admins** see extra controls on each item: status (Open / Planned /
   In progress / Completed / Declined), priority (Low → Critical), and
   delete. Unsorted items are flagged so the triage backlog is visible.
+- **Admins also get a Settings entry** (the Mini App's ⋯ menu, or a gear
+  on older clients) to choose what the bot announces in the group:
+  completions (on by default), new submissions, status changes, priority
+  changes, and upvotes.
 - **Non-members** of the bound group can't use the app at all.
 - Marking something **Completed** posts an announcement to the group with a
   button back into the tracker — "🐞 Fixed" for bugs, "✅ Shipped" for ideas.
