@@ -12,8 +12,6 @@ if (inTg) {
     // bar blends into it (Telegram only allows a solid color here).
     tg.setHeaderColor("#0e312c");
     tg.setBackgroundColor("#0c0d0a");
-    if (tg.setBottomBarColor) tg.setBottomBarColor("#0c0d0a");
-    tg.MainButton.setParams({ color: "#8de3be", text_color: "#0c0d0a" });
   } catch (e) { /* older clients */ }
 }
 
@@ -111,28 +109,24 @@ function goBack() {
 }
 
 /* Telegram native Back/Main buttons; in-page fallbacks cover plain browsers. */
+/* Native Back button stays; the bottom action button is drawn in-page so
+   the app fully owns its bottom edge (no Telegram bottom bar, no divider). */
 function syncChrome() {
-  if (!inTg) {
-    const fb = $("#fallback-submit");
-    if (fb) fb.disabled = S.submitting;
-    return;
+  if (inTg) {
+    if (S.view === "list") tg.BackButton.hide(); else tg.BackButton.show();
   }
-  if (S.view === "list") tg.BackButton.hide(); else tg.BackButton.show();
-
-  const mb = tg.MainButton;
-  if (S.view === "list") {
-    mb.setParams({ text: "New request", is_visible: true, is_active: true });
-  } else if (S.view === "submit") {
-    mb.setParams({ text: S.submitting ? "Submitting…" : "Submit", is_visible: true, is_active: !S.submitting });
-  } else if (S.view === "detail") {
-    const dirty = Object.keys(S.triage).length > 0;
-    if (S.me && S.me.is_admin && dirty) {
-      mb.setParams({ text: "Save changes", is_visible: true, is_active: true });
-    } else {
-      mb.hide();
-    }
-  } else if (S.view === "settings") {
-    mb.hide();
+  const bar = $("#action-bar");
+  const btn = $("#action-btn");
+  let label = null;
+  if (S.view === "list") label = "New Request";
+  else if (S.view === "submit") label = S.submitting ? "Submitting…" : "Submit";
+  else if (S.view === "detail" && S.me && S.me.is_admin && Object.keys(S.triage).length > 0) label = "Save changes";
+  if (label) {
+    btn.textContent = label;
+    btn.disabled = S.view === "submit" && S.submitting;
+    bar.hidden = false;
+  } else {
+    bar.hidden = true;
   }
 }
 
@@ -144,7 +138,6 @@ function mainAction() {
 
 if (inTg) {
   tg.BackButton.onClick(goBack);
-  tg.MainButton.onClick(mainAction);
 }
 
 /* ---------- list ---------- */
@@ -345,7 +338,6 @@ function triagePanel(s) {
         row.querySelectorAll(".chip").forEach((c) => c.classList.remove("selected"));
         chip.classList.add("selected");
         syncChrome();
-        renderFallbackSave(wrap);
       });
       row.append(chip);
     }
@@ -364,24 +356,7 @@ function triagePanel(s) {
   zone.append(del);
   wrap.append(zone);
 
-  renderFallbackSave(wrap);
   return wrap;
-}
-
-function renderFallbackSave(wrap) {
-  if (inTg) return;
-  let btn = wrap.querySelector(".save-fallback");
-  const dirty = Object.keys(S.triage).length > 0;
-  if (dirty && !btn) {
-    btn = el("button", "primary-btn save-fallback", "Save changes");
-    btn.type = "button";
-    btn.style.marginTop = "14px";
-    btn.style.width = "100%";
-    btn.addEventListener("click", saveTriage);
-    wrap.insertBefore(btn, wrap.querySelector(".danger-zone"));
-  } else if (!dirty && btn) {
-    btn.remove();
-  }
 }
 
 async function saveTriage() {
@@ -545,8 +520,8 @@ $("#tabs").addEventListener("click", (ev) => {
 });
 
 document.querySelectorAll("[data-back]").forEach((b) => b.addEventListener("click", goBack));
-$("#fallback-new").addEventListener("click", openSubmit);
 $("#fallback-settings").addEventListener("click", openSettings);
+$("#action-btn").addEventListener("click", mainAction);
 
 $("#submit-form").addEventListener("submit", (ev) => { ev.preventDefault(); submitForm(); });
 

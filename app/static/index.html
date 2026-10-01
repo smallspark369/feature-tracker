@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
   <div id="app">
@@ -16,7 +16,6 @@
     <!-- List -->
     <section id="view-list" class="view">
       <header class="topbar">
-        <button id="fallback-new" class="ghost-btn hide-in-tg" type="button">+ New</button>
         <button id="fallback-settings" class="ghost-btn" type="button" hidden aria-label="Settings">&#9881;</button>
         <nav id="tabs" class="tabs" role="tablist">
           <button class="tab active" data-tab="all" role="tab">All</button>
@@ -57,7 +56,6 @@
           </label>
           <p class="hint">Up to 4 images.</p>
         </div>
-        <button id="fallback-submit" class="primary-btn hide-in-tg" type="submit">Submit</button>
       </form>
     </section>
 
@@ -82,9 +80,13 @@
 
   </div>
 
+  <div id="action-bar" hidden>
+    <button id="action-btn" class="primary-btn" type="button"></button>
+  </div>
+
   <div id="lightbox" class="lightbox" hidden><img alt="Screenshot"></div>
   <div id="toast" class="toast" hidden></div>
 
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>
