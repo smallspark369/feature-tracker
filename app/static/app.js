@@ -12,6 +12,7 @@ if (inTg) {
     // bar blends into it (Telegram only allows a solid color here).
     tg.setHeaderColor("#0e312c");
     tg.setBackgroundColor("#0c0d0a");
+    if (tg.setBottomBarColor) tg.setBottomBarColor("#0c0d0a");
     tg.MainButton.setParams({ color: "#8de3be", text_color: "#0c0d0a" });
   } catch (e) { /* older clients */ }
 }
