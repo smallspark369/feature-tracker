@@ -11,7 +11,7 @@ if (inTg) {
     // Header color matches the top edge of the hero artwork so the native
     // bar blends into it (Telegram only allows a solid color here).
     tg.setHeaderColor("#0e312c");
-    tg.setBackgroundColor("#0c0d0a");
+    tg.setBackgroundColor("#11100d");
   } catch (e) { /* older clients */ }
 }
 

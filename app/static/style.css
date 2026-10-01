@@ -1,18 +1,18 @@
 /* Fixed dark theme matched to the community app's UI:
    warm near-black, charcoal panels, mint accent, outlined pill selection. */
 :root {
-  --bg: #0c0d0a;
-  --panel: #171814;
-  --elev: #212320;
-  --line: #2a2c27;
-  --text: #eceee9;
-  --hint: #8e948b;
-  --mint: #8de3be;
-  --mint-soft: rgba(141, 227, 190, .14);
+  --bg: #11100d;
+  --panel: #1a1916;
+  --elev: #242321;
+  --line: #2d2c28;
+  --text: #ffffff;
+  --hint: #838588;
+  --mint: #53f3ce;
+  --mint-soft: rgba(83, 243, 206, .14);
 
   --c-planned: #85b7e4;
   --c-progress: #e2b471;
-  --c-done: #8de3be;
+  --c-done: #53f3ce;
   --c-declined: #70756e;
   --c-bug: #e08078;
 
@@ -44,7 +44,7 @@ body.in-tg .hide-in-tg { display: none; }
   margin: 0 -14px;
   padding: 12px 14px 0;
   background:
-    linear-gradient(rgba(12, 13, 10, .30), rgba(12, 13, 10, .62)),
+    linear-gradient(rgba(17, 16, 13, .30), rgba(17, 16, 13, .62)),
     url("header-bg.jpg") center / cover no-repeat,
     var(--panel);
   border-bottom: 1px solid var(--line);
@@ -52,7 +52,7 @@ body.in-tg .hide-in-tg { display: none; }
 .tabs { flex: 1; display: flex; gap: 22px; }
 .tab {
   border: 0; background: none; cursor: pointer;
-  color: rgba(236, 238, 233, .68); font: inherit; font-size: .95rem; font-weight: 600;
+  color: rgba(255, 255, 255, .66); font: inherit; font-size: .95rem; font-weight: 600;
   padding: 6px 2px 12px;
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
@@ -247,7 +247,7 @@ input:focus-visible, textarea:focus-visible, button:focus-visible {
 /* ---- overlays ---- */
 .lightbox {
   position: fixed; inset: 0; z-index: 50;
-  background: rgba(5, 6, 4, .92);
+  background: rgba(9, 9, 7, .92);
   display: flex; align-items: center; justify-content: center;
   cursor: zoom-out; padding: 16px;
 }
