@@ -211,10 +211,10 @@ function card(s) {
 
   const body = el("div", "body");
   const h = el("h3", null, s.title);
+  if (s.kind === "bug") h.append(el("span", "tag-bug", "bug"));
   body.append(h);
 
   const meta = el("div", "meta");
-  if (s.kind === "bug") meta.append(el("span", "tag-bug", "bug"));
   meta.append(el("span", null, "#" + s.id));
   meta.append(el("span", "sep"));
   meta.append(el("span", null, s.submitter_name));
